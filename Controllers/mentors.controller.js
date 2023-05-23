@@ -2,24 +2,16 @@ const mentorRouter = require("express").Router();
 const Mentor = require("../Models/mentor.model");
 const Student = require("../Models/student.model");
 
-mentorRouter.post("/creatementor", async (req, res) => {
+mentorRouter.post('/creatementor', async (req, res) => {
   try {
     const mentor = new Mentor(req.body);
     await mentor.save();
-    res.status(201).json({
-      success: true,
-      message: "Mentor created successfully",
-      data: mentor,
-    });
+    res.status(201).json(mentor);
   } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: "Bad Request!!!",
-      data: res,
-      error: err.message,
-    });
+    res.status(400).json({ error: err.message });
   }
 });
+
 
 //assign student to mentor
 mentorRouter.post("/mentors/:mentorId/students", async (req, res) => {
@@ -62,5 +54,26 @@ mentorRouter.get("/mentors/:mentorId/students", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+//Get all mentors in student mentor hub
+mentorRouter.get('/mentors', async (req, res) => {
+  try {
+    const mentors = await Mentor.find();
+    res.status(200).json(mentors);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch mentors' });
+  }
+});
+
+mentorRouter.delete('/mentors/:mentorId', async (req, res) => {
+  try {
+    const { mentorId } = req.params;
+    await Mentor.findByIdAndDelete(mentorId);
+    res.status(200).json({ message: 'Mentor deleted successfully!' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 
 module.exports = mentorRouter;

@@ -13,6 +13,17 @@ studentRouter.post("/createstudent", async (req, res) => {
   }
 });
 
+
+studentRouter.get("/students", async (req, res) => {
+  try {
+    const students = await Student.find();
+    res.status(200).json(students);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch students" });
+  }
+});
+
+
 //Assign or change mentor for particular student
 studentRouter.put("/students/:studentId/mentor", async (req, res) => {
   try {
@@ -66,5 +77,19 @@ studentRouter.get("/students/:studentId/mentor", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
+studentRouter.delete("/students/:studentId", async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const student = await Student.findByIdAndDelete(studentId);
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+    res.json({ message: "Student deleted successfully" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 
 module.exports = studentRouter;
